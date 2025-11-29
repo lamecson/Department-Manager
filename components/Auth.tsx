@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User, Role } from '../types';
-import { Lock, Mail, User as UserIcon, ArrowRight, ShieldCheck } from 'lucide-react';
+import { Lock, User as UserIcon, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface AuthProps {
   users: User[];
@@ -10,8 +10,8 @@ interface AuthProps {
 
 const Auth: React.FC<AuthProps> = ({ users, onLogin, onSignup }) => {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState(''); // Simulated password
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [role, setRole] = useState<Role>(Role.EMPLOYEE);
   const [error, setError] = useState('');
@@ -21,24 +21,35 @@ const Auth: React.FC<AuthProps> = ({ users, onLogin, onSignup }) => {
     setError('');
 
     if (isLogin) {
-      const user = users.find(u => u.email === email);
-      // In a real app, verify password hash
-      if (user) {
+      // Find user by username
+      const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
+      
+      if (user && user.password === password) {
         onLogin(user);
       } else {
-        setError('Invalid credentials. Try email: manager@test.com');
+        setError('Invalid credentials. Check username (name.zehrs) and password.');
       }
     } else {
-      if (!name || !email || !password) {
+      // Signup Logic (Simplified for demo)
+      if (!name || !username || !password) {
         setError('Please fill all fields');
         return;
       }
+      
+      // Basic formatting check
+      if (!username.endsWith('.zehrs')) {
+         setError('Username must end with .zehrs');
+         return;
+      }
+
       const newUser: User = {
         id: Math.random().toString(36).substr(2, 9),
         name,
-        email,
+        username,
+        email: `${username}@store.com`, // Auto-generate email mock
+        password,
         role,
-        avatar: `https://picsum.photos/200/200?random=${Math.floor(Math.random() * 1000)}`,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${name}`,
         level: 1,
         xp: 0
       };
@@ -60,7 +71,7 @@ const Auth: React.FC<AuthProps> = ({ users, onLogin, onSignup }) => {
              <ShieldCheck className="text-white w-8 h-8" />
           </div>
           <h1 className="text-3xl font-bold text-gray-800 tracking-tight">TaskMaster Pro</h1>
-          <p className="text-gray-500 mt-2">Enterprise Management Platform</p>
+          <p className="text-gray-500 mt-2">Zehrs Retail Management</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -69,7 +80,7 @@ const Auth: React.FC<AuthProps> = ({ users, onLogin, onSignup }) => {
                <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
                <input 
                  type="text" 
-                 placeholder="Full Name"
+                 placeholder="Full Name (e.g. Jason)"
                  value={name}
                  onChange={e => setName(e.target.value)}
                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
@@ -78,12 +89,12 @@ const Auth: React.FC<AuthProps> = ({ users, onLogin, onSignup }) => {
           )}
           
           <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input 
-              type="email" 
-              placeholder="Email Address"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
+              type="text" 
+              placeholder="Username (e.g. lamec.zehrs)"
+              value={username}
+              onChange={e => setUsername(e.target.value)}
               className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all outline-none"
             />
           </div>
@@ -134,14 +145,14 @@ const Auth: React.FC<AuthProps> = ({ users, onLogin, onSignup }) => {
             onClick={() => { setIsLogin(!isLogin); setError(''); }}
             className="text-gray-500 hover:text-blue-600 text-sm font-medium transition-colors"
           >
-            {isLogin ? "Don't have an account? Sign Up" : "Already have an account? Sign In"}
+            {isLogin ? "New Employee? Register Access" : "Back to Login"}
           </button>
         </div>
       </div>
       
       {/* Demo helper */}
       <div className="absolute bottom-4 left-0 right-0 text-center text-xs text-gray-400">
-         <p>Demo Credentials: manager@test.com / employee@test.com</p>
+         <p>Default Manager: lamec.zehrs | Default Password: grocery</p>
       </div>
     </div>
   );

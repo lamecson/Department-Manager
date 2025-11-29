@@ -9,14 +9,25 @@ export enum TaskStatus {
   COMPLETED = 'COMPLETED'
 }
 
+export interface Note {
+  id: string;
+  text: string;
+  author: string;
+  date: string;
+  lastEditedBy?: string;
+}
+
 export interface User {
   id: string;
   name: string;
+  username: string; // e.g., lamec.zehrs
   email: string;
+  password?: string;
   role: Role;
   avatar?: string;
   level?: number; // Gamification
   xp?: number; // Gamification
+  privateNotes?: Note[]; // Manager notes for feedback
 }
 
 export interface Task {
@@ -29,6 +40,8 @@ export interface Task {
   instructions?: string;
   dueDate: string;
   xpReward: number; // Gamification
+  managerVerified?: boolean; // If manager approved the completion
+  assignedBy?: string;
 }
 
 export interface Shift {
