@@ -67,6 +67,7 @@ export const getTaskSuggestions = async (employeeName: string, recentTasks: Task
 export const generateFeedbackAnalysis = async (employeeName: string, notes: Note[], tasks: Task[]) => {
   try {
     const completedTasks = tasks.filter(t => t.status === 'COMPLETED').length;
+    // Format notes safely using template literals
     const notesText = notes.map(n => `"${n.text}" (${n.date})`).join('; ');
     
     const prompt = `

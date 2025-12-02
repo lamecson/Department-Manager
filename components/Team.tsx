@@ -255,10 +255,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                         <div className="space-y-2">
                           <h4 className="text-xs font-bold text-gray-400 uppercase">Previous Notes (History Log)</h4>
                           {[...selectedUser.privateNotes].reverse().map((note, idx) => {
-                             // Use original index from reversed array is tricky for editing, 
-                             // so we just map properly by matching content/id or just handling simple reverse map
-                             // A safer way for editing by index is to just render and find index
-                             // But for now, we use the reversed index logic: realIndex = length - 1 - idx
+                             // Reversed index calculation to find original index for editing
                              const realIndex = selectedUser.privateNotes!.length - 1 - idx;
                              
                              return (

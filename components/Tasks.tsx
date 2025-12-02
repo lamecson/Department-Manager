@@ -29,7 +29,8 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
   // Filters State
   const [filterEmployee, setFilterEmployee] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
-  const [filterDate, setFilterDate] = useState(new Date().toISOString().split('T')[0]); // Default to today
+  // CRITICAL FIX: Default to empty string so Managers see ALL history by default
+  const [filterDate, setFilterDate] = useState(''); 
 
   // Daily Planner State
   const [plannerAssignee, setPlannerAssignee] = useState(employees.filter(e => e.role !== Role.MANAGER)[0]?.id || '');
@@ -56,6 +57,8 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
     
     const assigneeName = employees.find(e => e.id === plannerAssignee)?.name;
     const assignedBy = currentUser.name;
+    // Default to today if creating a task
+    const assignDate = filterDate || new Date().toISOString().split('T')[0];
 
     // Create Standard Tasks
     if (selectedStandardTasks.length > 0) {
@@ -66,7 +69,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
           assignedToId: plannerAssignee,
           assignedBy: assignedBy,
           status: TaskStatus.TODO,
-          dueDate: filterDate,
+          dueDate: assignDate,
           imageUrl: `https://picsum.photos/600/400?random=${Math.floor(Math.random() * 1000)}`,
           instructions: 'Refer to department standard operating procedures.',
           xpReward: 50 // Default standard XP
@@ -89,7 +92,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
           assignedToId: plannerAssignee,
           assignedBy: assignedBy,
           status: TaskStatus.TODO,
-          dueDate: filterDate,
+          dueDate: assignDate,
           imageUrl: `https://picsum.photos/600/400?random=${Math.floor(Math.random() * 1000)}`,
           instructions: 'Please follow manager instructions.',
           xpReward: customTaskXP
@@ -188,7 +191,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
              <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-lg p-1 shadow-sm">
                <Filter className="w-4 h-4 text-gray-400 ml-2" />
                <select 
-                 className="bg-transparent text-sm text-gray-700 outline-none p-1"
+                 className="bg-transparent text-sm text-gray-700 outline-none p-1 cursor-pointer"
                  value={filterEmployee}
                  onChange={(e) => setFilterEmployee(e.target.value)}
                >
@@ -199,7 +202,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
                </select>
                <div className="w-px h-4 bg-gray-200 mx-1"></div>
                <select 
-                 className="bg-transparent text-sm text-gray-700 outline-none p-1"
+                 className="bg-transparent text-sm text-gray-700 outline-none p-1 cursor-pointer"
                  value={filterStatus}
                  onChange={(e) => setFilterStatus(e.target.value)}
                >
@@ -209,12 +212,24 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
                  <option value={TaskStatus.COMPLETED}>Completed</option>
                </select>
                <div className="w-px h-4 bg-gray-200 mx-1"></div>
-               <input 
-                 type="date" 
-                 value={filterDate}
-                 onChange={(e) => setFilterDate(e.target.value)}
-                 className="text-sm text-gray-700 outline-none bg-transparent p-1"
-               />
+               <div className="flex items-center relative">
+                 <input 
+                   type="date" 
+                   value={filterDate}
+                   onChange={(e) => setFilterDate(e.target.value)}
+                   className="text-sm text-gray-700 outline-none bg-transparent p-1 w-32"
+                   placeholder="All Dates"
+                 />
+                 {filterDate && (
+                    <button 
+                      onClick={() => setFilterDate('')}
+                      className="text-xs text-red-500 hover:text-red-700 absolute right-6 font-bold"
+                      title="Clear date filter"
+                    >
+                      X
+                    </button>
+                 )}
+               </div>
              </div>
             <button 
               onClick={() => setIsCreateModalOpen(true)}
@@ -244,7 +259,8 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
                 <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
                   {visibleTasks.filter(t => t.status === col.id).length === 0 && (
                     <div className="text-center py-10 text-gray-400 text-sm italic">
-                      No missions here.
+                      No missions found.
+                      {isManager && filterDate && <p className="text-xs mt-1 text-blue-400">Try clearing the date filter.</p>}
                     </div>
                   )}
                   {visibleTasks.filter(t => t.status === col.id).map(task => (
