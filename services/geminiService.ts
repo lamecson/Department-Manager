@@ -2,10 +2,9 @@ import { GoogleGenAI } from "@google/genai";
 import { Task, User, Note } from '../types';
 import { STANDARD_TASKS } from '../constants';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const getDashboardInsights = async (tasks: Task[], employees: User[]) => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const taskSummary = tasks.map(t => 
       `- ${t.title} (${t.status}): Assigned to ${employees.find(e => e.id === t.assignedToId)?.name || 'Unknown'}, Due: ${t.dueDate}`
     ).join('\n');
@@ -33,6 +32,7 @@ export const getDashboardInsights = async (tasks: Task[], employees: User[]) => 
 
 export const getTaskSuggestions = async (employeeName: string, recentTasks: Task[], availableTasks: string[] = STANDARD_TASKS) => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const taskHistory = recentTasks.map(t => t.title).join(', ');
     const tasksToConsider = availableTasks;
     
@@ -66,6 +66,7 @@ export const getTaskSuggestions = async (employeeName: string, recentTasks: Task
 
 export const generateFeedbackAnalysis = async (employeeName: string, notes: Note[], tasks: Task[]) => {
   try {
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const completedTasks = tasks.filter(t => t.status === 'COMPLETED').length;
     // Format notes safely using template literals
     const notesText = notes.map(n => `"${n.text}" (${n.date})`).join('; ');
