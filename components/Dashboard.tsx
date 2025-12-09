@@ -129,7 +129,7 @@ const Dashboard: React.FC<DashboardProps> = ({ tasks, employees }) => {
       </div>
 
       {/* KPI Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-blue-600 text-white p-4 md:p-5 rounded-xl shadow-lg shadow-blue-200">
           <div className="flex justify-between items-start">
             <div>

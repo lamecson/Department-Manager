@@ -6,7 +6,7 @@ import Dashboard from './components/Dashboard';
 import Team from './components/Team';
 import Tasks from './components/Tasks';
 import Shifts from './components/Shifts';
-import { LayoutDashboard, Users, CheckSquare, Calendar, LogOut, Menu, Key, Star } from 'lucide-react';
+import { LayoutDashboard, Users, CheckSquare, Calendar, LogOut, Menu, Key, Star, X } from 'lucide-react';
 
 const App: React.FC = () => {
   // Global State
@@ -18,8 +18,8 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('TASKS');
   
   // Responsive Sidebar State
-  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 768);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth >= 1024);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
   
   // UI State
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
@@ -29,13 +29,11 @@ const App: React.FC = () => {
   // Handle Resize
   useEffect(() => {
     const handleResize = () => {
-      const mobile = window.innerWidth < 768;
+      const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
       if (mobile) {
-        // Auto-close on mobile when resizing down
         setIsSidebarOpen(false);
       } else {
-        // Auto-open on desktop when resizing up (optional, keeps UI consistent)
         setIsSidebarOpen(true);
       }
     };
@@ -77,12 +75,14 @@ const App: React.FC = () => {
       ...newTask,
       id: Math.random().toString(36).substr(2, 9),
     };
-    setTasks([...tasks, task]);
+    // FIX: Use functional update to ensure multiple tasks added rapidly (bulk assign) don't overwrite each other
+    setTasks(prevTasks => [...prevTasks, task]);
   };
 
   const handleDeleteTask = (taskId: string) => {
     if (window.confirm('Are you sure you want to delete this task?')) {
-      setTasks(tasks.filter(t => t.id !== taskId));
+      // FIX: Use functional update for safety
+      setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
     }
   };
 
@@ -96,7 +96,7 @@ const App: React.FC = () => {
   };
 
   const handleUpdateTask = (updatedTask: Task) => {
-    setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t));
+    setTasks(prevTasks => prevTasks.map(t => t.id === updatedTask.id ? updatedTask : t));
     
     // Add XP if completed
     if (updatedTask.status === 'COMPLETED' && currentUser?.role === Role.EMPLOYEE) {
@@ -181,8 +181,7 @@ const App: React.FC = () => {
       }`}
     >
       <Icon className="w-5 h-5 min-w-[20px]" />
-      {/* Show label if open (desktop) or if sidebar is open (mobile) */}
-      {(isSidebarOpen || isMobile) && <span className="whitespace-nowrap">{label}</span>}
+      <span className="whitespace-nowrap">{label}</span>
     </button>
   );
 
@@ -206,7 +205,7 @@ const App: React.FC = () => {
       {/* Mobile Backdrop */}
       {isMobile && isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-30 transition-opacity"
+          className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
@@ -214,19 +213,24 @@ const App: React.FC = () => {
       {/* Sidebar */}
       <aside 
         className={`
-          fixed inset-y-0 left-0 z-40 bg-white h-full border-r border-slate-200 shadow-xl transition-all duration-300 flex flex-col
-          ${isSidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full w-64 md:translate-x-0 md:w-20'}
-          md:relative
+          fixed inset-y-0 left-0 z-50 bg-white h-full border-r border-slate-200 shadow-xl transition-transform duration-300 flex flex-col w-64
+          ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+          lg:translate-x-0 lg:static lg:z-auto
         `}
       >
-        <div className="p-6 flex items-center gap-3 border-b border-slate-100 h-20">
-           <div className="bg-blue-600 text-white p-2 rounded-lg font-bold text-xl shadow-md shrink-0">TM</div>
-           <div className={`transition-opacity duration-200 ${!isSidebarOpen && !isMobile ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100'}`}>
+        <div className="p-6 flex items-center justify-between border-b border-slate-100 h-20">
+           <div className="flex items-center gap-3">
+             <div className="bg-blue-600 text-white p-2 rounded-lg font-bold text-xl shadow-md shrink-0">TM</div>
              <h1 className="font-bold text-xl text-slate-800 tracking-tight whitespace-nowrap">TaskMaster</h1>
            </div>
+           {isMobile && (
+             <button onClick={() => setIsSidebarOpen(false)} className="text-slate-400 hover:text-slate-600">
+               <X className="w-5 h-5" />
+             </button>
+           )}
         </div>
 
-        <nav className="flex-1 p-4 overflow-y-auto">
+        <nav className="flex-1 p-4 overflow-y-auto custom-scrollbar">
           {currentUser.role === Role.MANAGER && (
             <NavItem view="DASHBOARD" icon={LayoutDashboard} label="Command Center" />
           )}
@@ -236,40 +240,41 @@ const App: React.FC = () => {
         </nav>
 
         <div className="p-4 border-t border-slate-100 bg-slate-50">
-          <div className={`flex items-center gap-3 mb-4 px-2 ${!isSidebarOpen && !isMobile ? 'justify-center' : ''}`}>
+          <div className="flex items-center gap-3 mb-4 px-2">
             <img src={currentUser.avatar} className="w-8 h-8 rounded-full border border-white shadow-sm shrink-0" alt="User" />
-            {(isSidebarOpen || isMobile) && (
-              <div className="overflow-hidden min-w-0">
-                <p className="text-sm font-bold text-slate-700 truncate">{currentUser.name}</p>
-                <button 
-                  onClick={() => setIsPasswordModalOpen(true)}
-                  className="text-xs text-blue-500 hover:text-blue-700 font-medium flex items-center gap-1 mt-0.5 whitespace-nowrap"
-                >
-                  <Key className="w-3 h-3" /> Change Password
-                </button>
-              </div>
-            )}
+            <div className="overflow-hidden min-w-0">
+              <p className="text-sm font-bold text-slate-700 truncate">{currentUser.name}</p>
+              <button 
+                onClick={() => setIsPasswordModalOpen(true)}
+                className="text-xs text-blue-500 hover:text-blue-700 font-medium flex items-center gap-1 mt-0.5 whitespace-nowrap"
+              >
+                <Key className="w-3 h-3" /> Change Password
+              </button>
+            </div>
           </div>
           <button 
             onClick={handleLogout}
-            className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 transition-all font-medium text-sm ${(!isSidebarOpen && !isMobile) && 'justify-center'}`}
+            className="w-full flex items-center gap-3 px-4 py-2 rounded-lg text-red-500 hover:bg-red-50 transition-all font-medium text-sm"
             title="Sign Out"
           >
             <LogOut className="w-4 h-4 shrink-0" />
-            {(isSidebarOpen || isMobile) && "Sign Out"}
+            Sign Out
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
+      <main className="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
         {/* Header */}
         <header className="h-16 bg-white/80 backdrop-blur border-b border-slate-200 flex items-center justify-between px-4 md:px-6 z-10 sticky top-0 shrink-0">
           <div className="flex items-center gap-3">
-            <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            <button 
+              onClick={() => setIsSidebarOpen(true)} 
+              className="p-2 hover:bg-slate-100 rounded-lg text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-100 lg:hidden"
+            >
               <Menu className="w-6 h-6" />
             </button>
-            <span className="font-bold text-slate-700 md:hidden">{currentView.charAt(0) + currentView.slice(1).toLowerCase()}</span>
+            <span className="font-bold text-slate-700 lg:hidden">{currentView.charAt(0) + currentView.slice(1).toLowerCase()}</span>
           </div>
           
           <div className="flex items-center gap-4">

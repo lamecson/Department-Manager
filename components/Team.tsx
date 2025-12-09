@@ -86,7 +86,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
         <Shield className="w-6 h-6" /> Team Roster
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {employees.map(employee => {
           const empTasks = tasks.filter(t => t.assignedToId === employee.id);
           const completedCount = empTasks.filter(t => t.status === TaskStatus.COMPLETED).length;
@@ -168,7 +168,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
       {/* --- Full Profile Modal (Manager View) --- */}
       {selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] md:h-[85vh] flex flex-col overflow-hidden animate-slideUp">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-full md:h-[85vh] max-h-[90vh] flex flex-col overflow-hidden animate-slideUp">
              {/* Header */}
              <div className="p-4 md:p-6 bg-slate-50 border-b border-gray-200 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-4">

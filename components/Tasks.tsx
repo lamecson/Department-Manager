@@ -59,6 +59,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
     const assignDate = filterDate || new Date().toISOString().split('T')[0];
 
     // Create Standard Tasks
+    // Note: onAddTask uses functional state update in App.tsx, so loop works correctly now.
     if (selectedStandardTasks.length > 0) {
       selectedStandardTasks.forEach(title => {
         onAddTask({
@@ -183,7 +184,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
                <div className="flex items-center gap-2 flex-1">
                  <Filter className="w-4 h-4 text-gray-400 ml-1 shrink-0" />
                  <select 
-                   className="bg-transparent text-sm text-gray-700 outline-none p-1 cursor-pointer w-full"
+                   className="bg-transparent text-sm text-gray-700 outline-none p-1 cursor-pointer w-full min-w-[120px]"
                    value={filterEmployee}
                    onChange={(e) => setFilterEmployee(e.target.value)}
                  >
@@ -228,7 +229,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
               onClick={() => setIsCreateModalOpen(true)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 md:py-2 rounded-lg flex items-center justify-center gap-2 shadow-md transition-all font-medium text-sm whitespace-nowrap mt-2 md:mt-0"
             >
-              <Plus className="w-4 h-4" /> <span className="md:hidden xl:inline">Assign</span> Task
+              <Plus className="w-4 h-4" /> <span className="xl:inline">Assign</span>
             </button>
           </div>
         )}
@@ -237,11 +238,11 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
       {/* Main Content Area */}
       {viewMode === 'BOARD' ? (
         // --- Kanban Board View ---
-        <div className="flex-1 overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0">
-          <div className="flex gap-4 md:gap-6 h-full min-w-[85vw] md:min-w-0 md:w-full">
+        // Responsive Change: Flex col on mobile, row on tablet/desktop
+        <div className="flex-1 flex flex-col md:flex-row gap-4 md:gap-6 h-full overflow-y-auto md:overflow-hidden pb-4">
             {columns.map(col => (
-              <div key={col.id} className="flex-1 flex flex-col bg-gray-50/50 rounded-2xl border border-gray-200/60 p-3 md:p-4 min-w-[260px] md:min-w-0">
-                <div className={`flex items-center gap-2 mb-4 p-2 rounded-lg ${col.bg}`}>
+              <div key={col.id} className="flex-1 flex flex-col bg-gray-50/50 rounded-2xl border border-gray-200/60 p-3 md:p-4 min-h-[300px] md:min-h-0 md:h-full">
+                <div className={`flex items-center gap-2 mb-4 p-2 rounded-lg ${col.bg} shrink-0`}>
                   <col.icon className={`w-5 h-5 ${col.color}`} />
                   <h3 className={`font-bold ${col.color} text-sm md:text-base`}>{col.label}</h3>
                   <span className="ml-auto bg-white px-2 py-0.5 rounded-md text-xs font-bold text-gray-500 shadow-sm">
@@ -291,7 +292,6 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
                 </div>
               </div>
             ))}
-          </div>
         </div>
       ) : (
         // --- List View (Management Mode) ---
@@ -558,7 +558,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
       {/* Daily Planner Modal (Manager Only) */}
       {isCreateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-[90vh] md:h-[85vh] flex flex-col animate-slideUp overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl h-full md:h-[85vh] max-h-[90vh] flex flex-col animate-slideUp overflow-hidden">
             <div className="p-4 md:p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50 shrink-0">
               <div>
                 <h3 className="text-lg md:text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -625,7 +625,7 @@ const Tasks: React.FC<TasksProps> = ({ tasks, employees, currentUser, standardTa
                     </div>
                  </div>
 
-                 <div className="mt-auto pt-4 md:pt-0">
+                 <div className="mt-auto pt-4 md:pt-0 pb-6 md:pb-0">
                     <button 
                       onClick={handleBulkCreate}
                       disabled={selectedStandardTasks.length === 0 && !customTaskTitle.trim()}
