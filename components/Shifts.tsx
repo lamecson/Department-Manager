@@ -19,12 +19,12 @@ const Shifts: React.FC<ShiftsProps> = ({ shifts, currentUser, onUploadShift }) =
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-blue-900 flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-xl md:text-2xl font-bold text-blue-900 flex items-center gap-2">
           <Calendar className="w-6 h-6" /> Shift Schedule
         </h2>
         {isManager && (
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <input 
               type="file" 
               id="shift-upload" 
@@ -34,7 +34,7 @@ const Shifts: React.FC<ShiftsProps> = ({ shifts, currentUser, onUploadShift }) =
             />
             <label 
               htmlFor="shift-upload" 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shadow-md transition-all cursor-pointer font-medium"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 md:py-2 rounded-lg flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer font-medium w-full sm:w-auto text-sm md:text-base"
             >
               <Upload className="w-4 h-4" /> Upload New Schedule
             </label>
@@ -51,18 +51,18 @@ const Shifts: React.FC<ShiftsProps> = ({ shifts, currentUser, onUploadShift }) =
         ) : (
           <div className="divide-y divide-gray-50">
             {shifts.map(shift => (
-              <div key={shift.id} className="p-6 hover:bg-blue-50/30 transition-colors flex items-center justify-between group">
-                <div className="flex items-center gap-4">
-                  <div className="bg-red-50 p-3 rounded-lg text-red-500">
+              <div key={shift.id} className="p-4 md:p-6 hover:bg-blue-50/30 transition-colors flex flex-col sm:flex-row items-start sm:items-center justify-between group gap-4">
+                <div className="flex items-center gap-4 w-full sm:w-auto">
+                  <div className="bg-red-50 p-3 rounded-lg text-red-500 shrink-0">
                     <FileText className="w-6 h-6" />
                   </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800">{shift.title}</h3>
+                  <div className="min-w-0">
+                    <h3 className="font-bold text-gray-800 truncate">{shift.title}</h3>
                     <p className="text-sm text-gray-500">Uploaded on {shift.date}</p>
-                    <p className="text-xs text-gray-400 mt-1">{shift.fileName}</p>
+                    <p className="text-xs text-gray-400 mt-1 truncate">{shift.fileName}</p>
                   </div>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex gap-2 self-end sm:self-center">
                    <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View">
                      <Eye className="w-5 h-5" />
                    </button>
@@ -77,7 +77,7 @@ const Shifts: React.FC<ShiftsProps> = ({ shifts, currentUser, onUploadShift }) =
       </div>
       
       {/* Visual Placeholder for Schedule Preview */}
-      <div className="bg-gray-100 rounded-xl p-8 border-2 border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 min-h-[300px]">
+      <div className="hidden md:flex bg-gray-100 rounded-xl p-8 border-2 border-dashed border-gray-300 flex-col items-center justify-center text-gray-400 min-h-[300px]">
          <img src="https://picsum.photos/800/400?grayscale&blur=2" className="opacity-20 rounded-lg mb-4" alt="Schedule Placeholder"/>
          <p>Select a schedule above to preview</p>
       </div>

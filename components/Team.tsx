@@ -86,7 +86,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
         <Shield className="w-6 h-6" /> Team Roster
       </h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {employees.map(employee => {
           const empTasks = tasks.filter(t => t.assignedToId === employee.id);
           const completedCount = empTasks.filter(t => t.status === TaskStatus.COMPLETED).length;
@@ -95,7 +95,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
             <div 
               key={employee.id} 
               onClick={() => currentUser.role === Role.MANAGER ? setSelectedUser(employee) : null}
-              className={`bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 overflow-hidden group ${currentUser.role === Role.MANAGER ? 'cursor-pointer' : ''}`}
+              className={`bg-white rounded-xl shadow-sm hover:shadow-lg transition-all border border-gray-100 overflow-hidden group ${currentUser.role === Role.MANAGER ? 'cursor-pointer active:scale-[0.98]' : ''}`}
             >
               <div className="h-24 bg-gradient-to-r from-blue-500 to-blue-600 relative">
                 <div className="absolute -bottom-10 left-6">
@@ -117,7 +117,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
               <div className="pt-12 px-6 pb-6">
                  <div className="flex justify-between items-start">
                    <div>
-                     <h3 className="font-bold text-xl text-gray-800">{employee.name}</h3>
+                     <h3 className="font-bold text-lg text-gray-800 truncate max-w-[120px]">{employee.name}</h3>
                      <p className="text-sm text-gray-500 font-mono text-xs mt-1 bg-gray-100 px-2 py-0.5 rounded inline-block">
                        {employee.username}
                      </p>
@@ -134,7 +134,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                        <span className="font-bold text-gray-800">{employee.xp}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                       <span className="text-gray-500">Missions Completed</span>
+                       <span className="text-gray-500">Missions Done</span>
                        <span className="font-bold text-emerald-600">{completedCount}</span>
                     </div>
                     
@@ -155,7 +155,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                       <button 
                          className="flex-1 bg-blue-50 text-blue-600 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-1 hover:bg-blue-100 transition-all"
                       >
-                        <ShieldCheck className="w-3 h-3" /> Evaluation
+                        <ShieldCheck className="w-3 h-3" /> Review
                       </button>
                    </div>
                  )}
@@ -168,14 +168,14 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
       {/* --- Full Profile Modal (Manager View) --- */}
       {selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-slideUp">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl h-[90vh] md:h-[85vh] flex flex-col overflow-hidden animate-slideUp">
              {/* Header */}
-             <div className="p-6 bg-slate-50 border-b border-gray-200 flex justify-between items-center">
+             <div className="p-4 md:p-6 bg-slate-50 border-b border-gray-200 flex justify-between items-center shrink-0">
                 <div className="flex items-center gap-4">
-                  <img src={selectedUser.avatar} className="w-16 h-16 rounded-full border-4 border-white shadow-sm bg-white" alt="Avatar"/>
+                  <img src={selectedUser.avatar} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-4 border-white shadow-sm bg-white" alt="Avatar"/>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-800">{selectedUser.name}</h2>
-                    <p className="text-gray-500 text-sm">Employee Profile & Performance Log</p>
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-800">{selectedUser.name}</h2>
+                    <p className="text-gray-500 text-xs md:text-sm">Employee Profile</p>
                   </div>
                 </div>
                 <button onClick={() => setSelectedUser(null)} className="p-2 hover:bg-gray-200 rounded-full">
@@ -183,10 +183,10 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                 </button>
              </div>
 
-             <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
+             <div className="flex-1 overflow-y-auto flex flex-col md:flex-row">
                 {/* Left: Task History */}
-                <div className="w-full md:w-1/2 border-r border-gray-200 flex flex-col">
-                   <div className="p-4 bg-gray-50 font-bold text-gray-700 flex items-center gap-2 border-b border-gray-100">
+                <div className="w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col shrink-0 h-1/2 md:h-auto">
+                   <div className="p-4 bg-gray-50 font-bold text-gray-700 flex items-center gap-2 border-b border-gray-100 sticky top-0 z-10">
                      <History className="w-5 h-5 text-blue-600" /> Mission History
                    </div>
                    <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
@@ -222,12 +222,12 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                 </div>
 
                 {/* Right: Coaching & Notes */}
-                <div className="flex-1 flex flex-col bg-slate-50">
-                   <div className="p-4 bg-white border-b border-gray-200 font-bold text-gray-700 flex items-center gap-2">
+                <div className="flex-1 flex flex-col bg-slate-50 h-1/2 md:h-auto">
+                   <div className="p-4 bg-white border-b border-gray-200 font-bold text-gray-700 flex items-center gap-2 sticky top-0 z-10">
                      <ClipboardList className="w-5 h-5 text-purple-600" /> Coaching Journal
                    </div>
                    
-                   <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                   <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 custom-scrollbar">
                       {/* Note Input */}
                       <div className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
                         <label className="text-xs font-bold text-gray-500 uppercase mb-2 block">Add Private Observation</label>
@@ -243,7 +243,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                           <button 
                             onClick={handleAddNote}
                             disabled={!noteInput.trim()}
-                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 disabled:opacity-50"
+                            className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 disabled:opacity-50 w-full md:w-auto justify-center"
                           >
                             <Save className="w-4 h-4" /> Save Note
                           </button>
@@ -255,7 +255,6 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                         <div className="space-y-2">
                           <h4 className="text-xs font-bold text-gray-400 uppercase">Previous Notes (History Log)</h4>
                           {[...selectedUser.privateNotes].reverse().map((note, idx) => {
-                             // Reversed index calculation to find original index for editing
                              const realIndex = selectedUser.privateNotes!.length - 1 - idx;
                              
                              return (
@@ -317,7 +316,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                            </h4>
                          </div>
                          <p className="text-xs text-indigo-600 mb-4">
-                           Generate a professional feedback script based on task history and notes from all managers.
+                           Generate a professional feedback script based on task history and notes.
                          </p>
                          
                          {!aiAnalysis ? (
@@ -377,7 +376,7 @@ const Team: React.FC<TeamProps> = ({ employees, tasks, currentUser, onUpdateUser
                    type="submit"
                    className="flex-1 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
                  >
-                   Update Password
+                   Update
                  </button>
                </div>
              </form>
